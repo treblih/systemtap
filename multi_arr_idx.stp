@@ -1,0 +1,14 @@
+#! /usr/bin/env stap
+
+global reads
+
+probe vfs.read
+{
+    reads[execname(), pid()] <<< 1
+}
+
+probe timer.s(3)
+{
+    foreach([name, pid] in reads)
+        printf("%s(%d) : %d\n", name, pid, @count(reads[name, pid]))
+}

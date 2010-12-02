@@ -1,0 +1,12 @@
+#!/usr/bin/stap -v
+ 
+# usrage: ./switch_proc process_name
+
+probe kernel.function("__switch_to")
+{
+    if (task_execname($next_p) == @1) {
+        printf("switch from [%s] to [%s]\n",
+            task_execname($prev_p),
+            task_execname($next_p))
+    }
+}

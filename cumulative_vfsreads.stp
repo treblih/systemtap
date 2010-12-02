@@ -1,15 +1,24 @@
 #! /usr/bin/env stap
 
-global reads
+global reads, totalreads
 
 probe kernel.function("vfs_read")
 {
     reads[execname()]++
+    totalreads[execname()]++
 }
 
 probe timer.s(3)
 {
-    foreach(cnt in reads)
+    print("===============================\n")
+    foreach(cnt in reads+ limit 10)
         printf("%s : %d\n", cnt, reads[cnt])
-    exit()
+    delete reads
+}
+
+probe end
+{
+    print("TOTAL\n")
+    foreach(cnt in totalreads+ limit 10)
+        printf("%s : %d\n", cnt, totalreads[cnt])
 }

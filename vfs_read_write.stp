@@ -1,0 +1,16 @@
+#! /usr/bin/env stap
+
+global read, write
+
+probe kernel.function("vfs_read"), kernel.function("vfs_write")
+{
+    if (probefunc() == "vfs_read") read++
+    else write++
+}
+
+probe timer.s(5) { exit() }
+
+probe end 
+{
+    printf("VFS reads total %d, writes total %d\n", read, write);
+}

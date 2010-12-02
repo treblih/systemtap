@@ -1,0 +1,15 @@
+#! /usr/bin/env stap
+
+global reads
+
+probe kernel.function("vfs_read")
+{
+    reads[execname()]++
+}
+
+probe timer.s(3)
+{
+    foreach(cnt in reads)
+        printf("%s : %d\n", cnt, reads[cnt])
+    exit()
+}
